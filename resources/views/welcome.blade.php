@@ -11,9 +11,19 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/theme/dracula.min.css" rel="stylesheet">
 
     <style>
+        .CodeMirror {
+            padding-top: 50px;
+            padding-right: 10px;
+            padding-bottom: 20px;
+            padding-left: 30px;
+
+            font-size: 25px;
+            font-weight: 800;
+        }
+
         body {
             margin: 0;
-            padding: 0;
+            padding: 20px;
             font-family: Arial, sans-serif;
             background-color: #f1f1f1;
         }
@@ -37,7 +47,7 @@
             background-color: #fff;
             box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
             border-radius: 5px;
-            max-width: 800px;
+            max-width: 80%vw;
             margin: auto;
         }
 
@@ -91,7 +101,6 @@
             border: none;
             background-color: transparent;
             font-family: monospace;
-            font-size: 14px;
             resize: none;
             padding: 50px;
         }
@@ -102,6 +111,7 @@
             margin-bottom: 20px;
             border-radius: 5px;
             overflow: hidden;
+            
         }
 
         #output-container {
@@ -111,7 +121,9 @@
             border: none;
             background-color: #fff;
             font-family: monospace;
-            font-size: 14px;
+            font-size: 25px;
+            color: green;
+            font-weight: 900;
             overflow-y: none;
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
         }
@@ -198,7 +210,8 @@
             matchBrackets: true,
             autoCloseBrackets: true,
             mode: "javascript",
-            theme: "dracula"
+            theme: "dracula",
+
         });
 
         // Set the editor width and height
