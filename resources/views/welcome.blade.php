@@ -111,12 +111,12 @@
             margin-bottom: 20px;
             border-radius: 5px;
             overflow: hidden;
-            
+
         }
 
         #output-container {
             padding: 50px;
-            width: 100%;
+            width: 85%;
             height: 100%;
             border: none;
             background-color: #fff;
@@ -141,13 +141,11 @@
 <body>
     <div class="top-container">
         <h1>Welcome to Kodebreakers!</h1>
-        <p>This is a simple online code editor that you can use to learn how to write code in various programming languages.</p>
-
         <div class="row">
             <div class="col-md-6">
                 <h2>Code Editor</h2>
                 <p>Enter your code in the editor below, then click the "Run" button to see the output.</p>
-                <button onclick="runCode()" class="btn">Run</button>
+
             </div>
             <div class="col">
                 <h2>Output</h2>
@@ -160,6 +158,9 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="editor-container">
+                    <button onclick="runCode()" class="btn">
+                        <h1>RUN</h1>
+                    </button>
                     <textarea id="editor"></textarea>
                 </div>
             </div>
@@ -195,9 +196,24 @@
             try {
                 eval(code);
             } catch (error) {
-                // If an error occurs, display it in the output container
+                // If an error occurs, display a custom error message in the output container
+                var errorMessage = 'Error: ' + error.name + '\nMessage: ' + error.message + '\n\n';
+                errorMessage += 'Possible fix: ';
+                switch (error.name) {
+                    case 'SyntaxError':
+                        errorMessage += 'Check for syntax errors in your code and correct them.';
+                        break;
+                    case 'ReferenceError':
+                        errorMessage += 'Make sure that all variable and function names are spelled correctly and exist in the current scope.';
+                        break;
+                    case 'TypeError':
+                        errorMessage += 'Check the data types of your variables and make sure that they are used correctly in your code.';
+                        break;
+                    default:
+                        errorMessage += 'Check your code for any errors and try again.';
+                }
                 var p = document.createElement('p');
-                p.innerText = 'Error: ' + error.message;
+                p.innerText = errorMessage;
                 p.style.color = 'red';
                 outputContainer.appendChild(p);
             }
