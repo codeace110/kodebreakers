@@ -11,13 +11,14 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/theme/dracula.min.css" rel="stylesheet">
 
     <style>
+        /*************************** */
         .CodeMirror {
             padding-top: 50px;
             padding-right: 10px;
             padding-bottom: 20px;
             padding-left: 30px;
 
-            font-size: 25px;
+            font-size: 17px;
             font-weight: 800;
         }
 
@@ -86,6 +87,16 @@
 
         /****************************************/
 
+        #youtube {
+
+            width: 100%;
+            height: 680px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+            display: flex;
+
+        }
 
         .editor-container {
             width: 100%;
@@ -107,10 +118,10 @@
 
         .output-container {
             width: 100%;
-            height: 500px;
+            height: 150px;
             margin-bottom: 20px;
             border-radius: 5px;
-            overflow: hidden;
+            overflow: scroll;
 
         }
 
@@ -121,7 +132,7 @@
             border: none;
             background-color: #fff;
             font-family: monospace;
-            font-size: 25px;
+            font-size: 16px;
             color: green;
             font-weight: 900;
             overflow-y: none;
@@ -135,11 +146,38 @@
                 max-width: 100%;
             }
         }
+
+        .nav-link {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #4caf50;
+            color: #fff;
+            border-radius: 0.25rem;
+            text-decoration: none;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .nav-link:hover {
+            background-color: #3e8e41;
+        }
     </style>
 </head>
 
 <body>
     <div class="top-container">
+        @if (Route::has('login'))
+        <div class="sm:fixed sm:top-0 sm:right-0 p-6 text-right">
+            @auth
+            <a href="{{ url('/dashboard') }}" class="nav-link">Dashboard</a>
+            @else
+            <a href="{{ route('login') }}" class="nav-link">Log in</a>
+
+            @if (Route::has('register'))
+            <a href="{{ route('register') }}" class="nav-link">Register</a>
+            @endif
+            @endauth
+        </div>
+        @endif
         <h1>Welcome to Kodebreakers!</h1>
         <div class="row">
             <div class="col-md-6">
@@ -157,17 +195,20 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6">
-                <div class="editor-container">
-                    <button onclick="runCode()" class="btn">
-                        <h1>RUN</h1>
-                    </button>
-                    <textarea id="editor"></textarea>
-                </div>
+            <iframe id="youtube" src="https://www.youtube.com/embed/PkZNo7MFNFg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
             </div>
 
             <div class="col">
                 <div class="output-container">
                     <div id="output-container"></div>
+                </div>
+
+                <div class="editor-container">
+                    <button onclick="runCode()" class="btn">
+                        <h1>RUN</h1>
+                    </button>
+                    <textarea id="editor"></textarea>
                 </div>
             </div>
         </div>
