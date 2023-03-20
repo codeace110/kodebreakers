@@ -73,7 +73,7 @@
             width: 100%;
             height: 6%;
             display: inline-block;
-            
+
             border: none;
             border-radius: 5px;
             background-color: #1e90ff;
@@ -110,7 +110,7 @@
         }
 
         #editor {
-            
+
             flex: 1;
             border: none;
             background-color: transparent;
@@ -197,29 +197,102 @@
     </div>
 
     <div class="container">
+        <div class="col-md-6">
+            <form id="search-form" action="https://www.youtube.com/results" method="get" target="_blank">
+                <input type="text" name="search_query" placeholder="Search YouTube" style="width: 300px; height: 30px; font-size: 20px;">
+                <input type="submit" value="Search" style="width: 100px; height: 30px; font-size: 20px;">
+            </form>
+        </div>
         <div class="row">
             <div class="col-md-6">
+                <div id="video-container">
+
+                </div>
                 <iframe id="youtube" src="https://www.youtube.com/embed/PkZNo7MFNFg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
             </div>
-
             <div class="col">
                 <div class="output-container">
                     <iframe id="output-container"></iframe>
                 </div>
-                <button onclick="runCode()" class="btn"><h1>RUN</h1></button>
+                <button onclick="runCode()" class="btn">
+                    <h1>RUN</h1>
+                </button>
                 <div class="editor-container">
-                
-                <textarea id="editor"></textarea>
-                
+                    <textarea id="editor"></textarea>
                 </div>
             </div>
         </div>
     </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/mode/javascript/javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/addon/edit/matchbrackets.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/addon/edit/closebrackets.min.js"></script>
+
+    <script>
+        document.getElementById('search-button').addEventListener('click', function() {
+    searchVideos();
+});
+
+document.getElementById('search-input').addEventListener('keydown', function(event) {
+    if (event.keyCode === 13) {
+        searchVideos();
+    }
+});
+
+function searchVideos() {
+    var apiKey = 'AIzaSyBALms3ci_3-YmPoIOoOdwx8IQf2zLfj6g';
+    var keyword = document.getElementById('search-input').value;
+    var url = 'https://www.googleapis.com/youtube/v3/search?key=' + apiKey + '&q=' + keyword;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url);
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText);
+            var videos = response.items;
+            displayVideos(videos);
+        } else {
+            console.log('Error: ' + xhr.status);
+        }
+    };
+    xhr.send();
+}
+
+function displayVideos(videos) {
+    var container = document.getElementById('video-container');
+
+    // Remove the default video from the container
+    container.removeChild(container.firstChild);
+
+    videos.forEach(function(video) {
+        var videoId = video.id.videoId;
+        var title = video.snippet.title;
+        var description = video.snippet.description;
+
+        // Create a new iframe for each video
+        var iframe = document.createElement('iframe');
+        iframe.src = 'https://www.youtube.com/embed/' + videoId;
+        iframe.width = '560';
+        iframe.height = '315';
+        iframe.allowFullscreen = true;
+
+        // Create a new div to hold the title and description of the video
+        var div = document.createElement('div');
+        var h3 = document.createElement('h3');
+        h3.innerText = title;
+        var p = document.createElement('p');
+        p.innerText = description;
+        div.appendChild(h3);
+        div.appendChild(p);
+
+        // Add the iframe and div to the container
+        container.appendChild(iframe);
+        container.appendChild(div);
+    });
+}
+    </script>
+
     <script>
         function runCode() {
             var outputContainer = document.getElementById('output-container');
