@@ -15,7 +15,7 @@
     <style>
         /*************************** */
         .CodeMirror {
-            padding-top: 50px;
+            padding-top: 20px;
             padding-right: 10px;
             padding-bottom: 20px;
             padding-left: 30px;
@@ -77,7 +77,7 @@
             display: inline-block;
 
             border: none;
-            border-radius: 5px;
+            border-radius: 5px 5px 0px 0px;
             background-color: #1e90ff;
             color: #fff;
             font-size: 11px;
@@ -92,9 +92,9 @@
         /****************************************/
 
         #youtube {
-
+            margin-top: 5px;
             width: 100%;
-            height: 680px;
+            height: 639px;
             margin-bottom: 20px;
             border-radius: 5px;
             overflow: hidden;
@@ -106,9 +106,10 @@
             width: 100%;
             height: 470px;
             margin-bottom: 20px;
-            border-radius: 5px;
+            border-radius: 0px 0px 5px 5px;
             overflow: hidden;
             display: flex;
+
         }
 
         #editor {
@@ -118,7 +119,8 @@
             background-color: transparent;
             font-family: monospace;
             resize: none;
-            padding: 50px;
+            padding: 20px;
+           
         }
 
         .output-container {
@@ -132,7 +134,7 @@
         }
 
         #output-container {
-            padding: 50px;
+            padding: 15px;
             width: 85%;
             height: 100%;
             border: none;
@@ -168,6 +170,37 @@
         }
 
         /** youtube videos */
+        form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            width: 70%;
+            margin-right: 10px;
+            background-color: none;
+        }
+
+        button[type="submit"] {
+            background-color: #0073e6;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0066cc;
+        }
     </style>
 </head>
 
@@ -207,7 +240,6 @@
                     <input type="text" id="search" placeholder="Search YouTube">
                     <button type="submit">Search</button>
                 </form>
-
                 <!-- Add an iframe container for the YouTube video -->
                 <iframe id="youtube" src="https://www.youtube.com/embed/PkZNo7MFNFg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
