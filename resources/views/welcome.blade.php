@@ -229,6 +229,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/addon/edit/matchbrackets.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/addon/edit/closebrackets.min.js"></script>
     <script>
+        document.addEventListener("DOMContentLoaded", function(event) {
+            initEditor();
+        });
+    </script>
+    <script>
         function searchYouTube() {
             // Check if the gapi client library has finished loading and initializing
             if (!gapi.client) {
@@ -346,11 +351,6 @@
         // Listen for window resize events and adjust the output container height accordingly
         window.addEventListener('resize', function() {
             outputContainer.style.height = (window.innerHeight - 120) + 'px';
-        });
-
-        // Initialize the editor when the DOM is ready
-        document.addEventListener("DOMContentLoaded", function(event) {
-            initEditor();
         });
     </script>
 </body>
