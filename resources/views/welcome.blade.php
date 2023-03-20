@@ -70,13 +70,15 @@
         }
 
         .btn {
+            width: 100%;
+            height: 6%;
             display: inline-block;
-            padding: 10px 20px;
+            
             border: none;
             border-radius: 5px;
             background-color: #1e90ff;
             color: #fff;
-            font-size: 16px;
+            font-size: 11px;
             cursor: pointer;
             transition: background-color 0.3s ease-in-out;
         }
@@ -100,7 +102,7 @@
 
         .editor-container {
             width: 100%;
-            height: 500px;
+            height: 470px;
             margin-bottom: 20px;
             border-radius: 5px;
             overflow: hidden;
@@ -108,6 +110,7 @@
         }
 
         #editor {
+            
             flex: 1;
             border: none;
             background-color: transparent;
@@ -121,7 +124,8 @@
             height: 150px;
             margin-bottom: 20px;
             border-radius: 5px;
-            overflow: scroll;
+            overflow-y: scroll;
+            overflow-x: hidden;
 
         }
 
@@ -195,20 +199,19 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6">
-            <iframe id="youtube" src="https://www.youtube.com/embed/PkZNo7MFNFg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe id="youtube" src="https://www.youtube.com/embed/PkZNo7MFNFg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
             </div>
 
             <div class="col">
                 <div class="output-container">
-                    <div id="output-container"></div>
+                    <iframe id="output-container"></iframe>
                 </div>
-
+                <button onclick="runCode()" class="btn"><h1>RUN</h1></button>
                 <div class="editor-container">
-                    <button onclick="runCode()" class="btn">
-                        <h1>RUN</h1>
-                    </button>
-                    <textarea id="editor"></textarea>
+                
+                <textarea id="editor"></textarea>
+                
                 </div>
             </div>
         </div>
@@ -223,19 +226,19 @@
             var code = editor.getValue();
 
             // Clear the output container
-            outputContainer.innerHTML = '';
+            outputContainer.contentWindow.document.body.innerHTML = '';
 
             // Redirect console.log() to the output container
             var oldLog = console.log;
             console.log = function(message) {
-                var pre = document.createElement('pre');
+                var pre = outputContainer.contentWindow.document.createElement('pre');
                 pre.innerText = message;
-                outputContainer.appendChild(pre);
+                outputContainer.contentWindow.document.body.appendChild(pre);
             };
 
             // Try to run the code and catch any errors
             try {
-                eval(code);
+                outputContainer.contentWindow.eval(code);
             } catch (error) {
                 // If an error occurs, display a custom error message in the output container
                 var errorMessage = 'Error: ' + error.name + '\nMessage: ' + error.message + '\n\n';
@@ -253,10 +256,10 @@
                     default:
                         errorMessage += 'Check your code for any errors and try again.';
                 }
-                var p = document.createElement('p');
+                var p = outputContainer.contentWindow.document.createElement('p');
                 p.innerText = errorMessage;
                 p.style.color = 'red';
-                outputContainer.appendChild(p);
+                outputContainer.contentWindow.document.body.appendChild(p);
             }
 
             // Restore console.log()
@@ -281,6 +284,11 @@
         // Listen for window resize events and adjust the output container height accordingly
         window.addEventListener('resize', function() {
             outputContainer.style.height = (window.innerHeight - 120) + 'px';
+        });
+
+        // Initialize the editor when the DOM is ready
+        document.addEventListener("DOMContentLoaded", function(event) {
+            initEditor();
         });
     </script>
 </body>
