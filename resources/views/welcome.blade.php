@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kodebreakers</title>
+    <script src="https://apis.google.com/js/api.js"></script>
+
     <link href="https://fonts.googleapis.com/css?family=Figtree:400,600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0-beta1/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/codemirror.min.css" rel="stylesheet">
@@ -164,6 +166,8 @@
         .nav-link:hover {
             background-color: #3e8e41;
         }
+
+        /** youtube videos */
     </style>
 </head>
 
@@ -197,17 +201,14 @@
     </div>
 
     <div class="container">
-        <div class="col-md-6">
-            <form id="search-form" action="https://www.youtube.com/results" method="get" target="_blank">
-                <input type="text" name="search_query" placeholder="Search YouTube" style="width: 300px; height: 30px; font-size: 20px;">
-                <input type="submit" value="Search" style="width: 100px; height: 30px; font-size: 20px;">
-            </form>
-        </div>
         <div class="row">
             <div class="col-md-6">
-                <div id="video-container">
+                <form onsubmit="return searchYouTube();">
+                    <input type="text" id="search" placeholder="Search YouTube">
+                    <button type="submit">Search</button>
+                </form>
 
-                </div>
+                <!-- Add an iframe container for the YouTube video -->
                 <iframe id="youtube" src="https://www.youtube.com/embed/PkZNo7MFNFg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
             <div class="col">
@@ -223,76 +224,64 @@
             </div>
         </div>
     </div>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/mode/javascript/javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/addon/edit/matchbrackets.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/addon/edit/closebrackets.min.js"></script>
-
     <script>
-        document.getElementById('search-button').addEventListener('click', function() {
-    searchVideos();
-});
+        function searchYouTube() {
+            // Check if the gapi client library has finished loading and initializing
+            if (!gapi.client) {
+                console.error("Error: gapi client library not available.");
+                return false;
+            }
 
-document.getElementById('search-input').addEventListener('keydown', function(event) {
-    if (event.keyCode === 13) {
-        searchVideos();
-    }
-});
+            // Check if the youtube object is defined
+            if (!gapi.client.youtube) {
+                console.error("Error: gapi client library loaded, but youtube object not available.");
+                return false;
+            }
 
-function searchVideos() {
-    var apiKey = 'AIzaSyBALms3ci_3-YmPoIOoOdwx8IQf2zLfj6g';
-    var keyword = document.getElementById('search-input').value;
-    var url = 'https://www.googleapis.com/youtube/v3/search?key=' + apiKey + '&q=' + keyword;
+            // Get the search query from the input field
+            var query = document.getElementById("search").value;
 
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url);
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            var response = JSON.parse(xhr.responseText);
-            var videos = response.items;
-            displayVideos(videos);
-        } else {
-            console.log('Error: ' + xhr.status);
+            // Use the YouTube API to search for videos
+            gapi.client.youtube.search.list({
+                q: query,
+                part: "snippet",
+                maxResults: 1,
+            }).then(function(response) {
+                var videoId = response.result.items[0].id.videoId;
+                var videoUrl = "https://www.youtube.com/embed/" + videoId;
+
+                // Set the iframe source to the search result video URL
+                document.getElementById("youtube").src = videoUrl;
+            }, function(error) {
+                console.error("Error searching YouTube: " + error.result.error.message);
+            });
+
+            // Prevent the form from submitting and reloading the page
+            return false;
         }
-    };
-    xhr.send();
-}
 
-function displayVideos(videos) {
-    var container = document.getElementById('video-container');
+        function init() {
+            // Load the YouTube API client library
+            gapi.load("client", function() {
+                gapi.client.init({
+                    apiKey: "AIzaSyA1OfrmluYM9HIQqJZRCpQ6VVwTELD8yaU",
+                    discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest"],
+                }).then(function() {
+                    // gapi is ready, call searchYouTube() function
+                    console.log("gapi ready");
+                }, function(error) {
+                    console.error("Error initializing gapi client: " + error);
+                });
+            });
+        }
 
-    // Remove the default video from the container
-    container.removeChild(container.firstChild);
-
-    videos.forEach(function(video) {
-        var videoId = video.id.videoId;
-        var title = video.snippet.title;
-        var description = video.snippet.description;
-
-        // Create a new iframe for each video
-        var iframe = document.createElement('iframe');
-        iframe.src = 'https://www.youtube.com/embed/' + videoId;
-        iframe.width = '560';
-        iframe.height = '315';
-        iframe.allowFullscreen = true;
-
-        // Create a new div to hold the title and description of the video
-        var div = document.createElement('div');
-        var h3 = document.createElement('h3');
-        h3.innerText = title;
-        var p = document.createElement('p');
-        p.innerText = description;
-        div.appendChild(h3);
-        div.appendChild(p);
-
-        // Add the iframe and div to the container
-        container.appendChild(iframe);
-        container.appendChild(div);
-    });
-}
+        // Add an event listener to wait for the window to load before calling init()
+        window.addEventListener('load', init);
     </script>
-
     <script>
         function runCode() {
             var outputContainer = document.getElementById('output-container');
