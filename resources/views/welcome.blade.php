@@ -13,7 +13,50 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/theme/dracula.min.css" rel="stylesheet">
 
     <style>
-        /*************************** */
+        /*********** dark and light mode**************** */
+        /* Dark Theme */
+        .dark-theme {
+            background-color: #222;
+            color: #fff;
+        }
+
+        .dark-theme .top-container {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .dark-theme .btn {
+            background-color: #0077b3;
+            color: #fff;
+        }
+
+        .dark-theme h1,
+        .dark-theme h2,
+        .dark-theme p,
+        .dark-theme label {
+            color: #fff;
+        }
+
+        .dark-theme .nav-link {
+            background-color: #3e8e41;
+            color: #fff;
+        }
+
+        .dark-theme #youtube {
+            background-color: #333;
+        }
+
+        .dark-theme #editor {
+            background-color: #222;
+            color: #fff;
+        }
+
+        .dark-theme #output-container {
+            background-color: white;
+            color: #fff;
+        }
+
+        /************ code mirror*************** */
         .CodeMirror {
             padding-top: 20px;
             padding-right: 10px;
@@ -41,6 +84,7 @@
             text-align: center;
         }
 
+        /************ container for outpu*************** */
         .top-container {
             display: flex;
             flex-direction: column;
@@ -89,7 +133,7 @@
             background-color: #0077b3;
         }
 
-        /****************************************/
+        /****************youtube iframe************************/
 
         #youtube {
             margin-top: 5px;
@@ -120,7 +164,7 @@
             font-family: monospace;
             resize: none;
             padding: 20px;
-           
+
         }
 
         .output-container {
@@ -169,7 +213,7 @@
             background-color: #3e8e41;
         }
 
-        /** youtube videos */
+        /************youtube videos*************** */
         form {
             display: flex;
             justify-content: center;
@@ -220,6 +264,7 @@
         </div>
         @endif
         <h1>Welcome to Kodebreakers!</h1>
+        <button id="theme-toggle" class="btn">Toggle Theme</button>
         <div class="row">
             <div class="col-md-6">
                 <h2>Code Editor</h2>
@@ -260,6 +305,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/mode/javascript/javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/addon/edit/matchbrackets.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/addon/edit/closebrackets.min.js"></script>
+    <script>
+        const toggleButton = document.getElementById("theme-toggle");
+        const body = document.body;
+
+        toggleButton.addEventListener("click", function() {
+            body.classList.toggle("dark-theme");
+        });
+    </script>
     <script>
         document.addEventListener("DOMContentLoaded", function(event) {
             initEditor();
@@ -327,12 +380,38 @@
             // Clear the output container
             outputContainer.contentWindow.document.body.innerHTML = '';
 
+            // Create a div element to display the console output
+            var consoleOutput = document.createElement("div");
+            document.body.appendChild(consoleOutput);
+
+            // Override console.log to display output on the DOM
+            var oldLog = console.log;
+            console.log = function() {
+                var message = Array.prototype.slice.call(arguments).join(' ');
+                consoleOutput.innerHTML += message + "<br>";
+                oldLog.apply(this, arguments);
+            };
+
             // Redirect console.log() to the output container
             var oldLog = console.log;
-            console.log = function(message) {
-                var pre = outputContainer.contentWindow.document.createElement('pre');
+            console.log = function() {
+                var message = Array.prototype.slice.call(arguments).join(' ');
+                var pre = outputContainer.contentWindow.document.createElement('div');
                 pre.innerText = message;
                 outputContainer.contentWindow.document.body.appendChild(pre);
+                oldLog.apply(this, arguments);
+                consoleOutput.innerHTML += message + "<br>"; // Display output on the DOM
+            };
+
+            // Redirect console.error() to the output container
+            var oldError = console.error;
+            console.error = function() {
+                var message = Array.prototype.slice.call(arguments).join(' ');
+                var pre = outputContainer.contentWindow.document.createElement('pre');
+                pre.innerText = message;
+                pre.style.color = 'red';
+                outputContainer.contentWindow.document.body.appendChild(pre);
+                oldError.apply(this, arguments);
             };
 
             // Try to run the code and catch any errors
@@ -361,8 +440,9 @@
                 outputContainer.contentWindow.document.body.appendChild(p);
             }
 
-            // Restore console.log()
+            // Restore console.log() and console.error()
             console.log = oldLog;
+            console.error = oldError;
         };
         var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
             lineNumbers: true,
