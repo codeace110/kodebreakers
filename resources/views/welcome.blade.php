@@ -116,12 +116,12 @@
         }
 
         .btn {
-            width: 100%;
-            height: 6%;
+            width: 200px;
+            height: 50px;
             display: inline-block;
-
             border: none;
-            border-radius: 5px 5px 0px 0px;
+            border-radius: 5px;
+            margin-bottom: -20px;
             background-color: #1e90ff;
             color: #fff;
             font-size: 11px;
@@ -153,6 +153,7 @@
             border-radius: 0px 0px 5px 5px;
             overflow: hidden;
             display: flex;
+
 
         }
 
@@ -290,11 +291,29 @@
             </div>
             <div class="col">
                 <div class="output-container">
-                    <iframe id="output-container"></iframe>
+                    <div id="output-container">
+                    </div>
                 </div>
-                <button onclick="runCode()" class="btn">
-                    <h1>RUN</h1>
-                </button>
+                <div class="container text-center">
+                    <div class="row align-items-start">
+                        <div class="col">
+                            <button onclick="runCode()" class="btn">
+                                <h1>RUN</h1>
+                            </button>
+                        </div>
+                        <div class="col-2" styl>
+                            <button style="width:150px;" class="btn">
+                                <h1>LOG</h1>
+                            </button>
+                        </div>
+                        <div class="col">
+                            <button style="width:150px;" class="btn">
+                                <h1>Output</h1>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="editor-container">
                     <textarea id="editor"></textarea>
                 </div>
@@ -319,150 +338,72 @@
         });
     </script>
     <script>
-        function searchYouTube() {
-            // Check if the gapi client library has finished loading and initializing
-            if (!gapi.client) {
-                console.error("Error: gapi client library not available.");
-                return false;
-            }
-
-            // Check if the youtube object is defined
-            if (!gapi.client.youtube) {
-                console.error("Error: gapi client library loaded, but youtube object not available.");
-                return false;
-            }
-
-            // Get the search query from the input field
-            var query = document.getElementById("search").value;
-
-            // Use the YouTube API to search for videos
-            gapi.client.youtube.search.list({
-                q: query,
-                part: "snippet",
-                maxResults: 1,
-            }).then(function(response) {
-                var videoId = response.result.items[0].id.videoId;
-                var videoUrl = "https://www.youtube.com/embed/" + videoId;
-
-                // Set the iframe source to the search result video URL
-                document.getElementById("youtube").src = videoUrl;
-            }, function(error) {
-                console.error("Error searching YouTube: " + error.result.error.message);
-            });
-
-            // Prevent the form from submitting and reloading the page
-            return false;
-        }
-
-        function init() {
-            // Load the YouTube API client library
-            gapi.load("client", function() {
-                gapi.client.init({
-                    apiKey: "AIzaSyA1OfrmluYM9HIQqJZRCpQ6VVwTELD8yaU",
-                    discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest"],
-                }).then(function() {
-                    // gapi is ready, call searchYouTube() function
-                    console.log("gapi ready");
-                }, function(error) {
-                    console.error("Error initializing gapi client: " + error);
-                });
-            });
-        }
-
-        // Add an event listener to wait for the window to load before calling init()
-        window.addEventListener('load', init);
-    </script>
-    <script>
         function runCode() {
             var outputContainer = document.getElementById('output-container');
             var code = editor.getValue();
-
             // Clear the output container
-            outputContainer.contentWindow.document.body.innerHTML = '';
-
-            // Create a div element to display the console output
-            var consoleOutput = document.createElement("div");
-            document.body.appendChild(consoleOutput);
-
-            // Override console.log to display output on the DOM
-            var oldLog = console.log;
-            console.log = function() {
-                var message = Array.prototype.slice.call(arguments).join(' ');
-                consoleOutput.innerHTML += message + "<br>";
-                oldLog.apply(this, arguments);
-            };
-
+            outputContainer.innerHTML = '';
             // Redirect console.log() to the output container
+
+
+
             var oldLog = console.log;
-            console.log = function() {
-                var message = Array.prototype.slice.call(arguments).join(' ');
-                var pre = outputContainer.contentWindow.document.createElement('div');
-                pre.innerText = message;
-                outputContainer.contentWindow.document.body.appendChild(pre);
-                oldLog.apply(this, arguments);
-                consoleOutput.innerHTML += message + "<br>"; // Display output on the DOM
-            };
+            console.log = function(message) {
+                var div = document.createElement('div');
+                div.innerText = message;
+                outputContainer.appendChild(div);
 
-            // Redirect console.error() to the output container
-            var oldError = console.error;
-            console.error = function() {
-                var message = Array.prototype.slice.call(arguments).join(' ');
-                var pre = outputContainer.contentWindow.document.createElement('pre');
-                pre.innerText = message;
-                pre.style.color = 'red';
-                outputContainer.contentWindow.document.body.appendChild(pre);
-                oldError.apply(this, arguments);
             };
-
             // Try to run the code and catch any errors
             try {
-                outputContainer.contentWindow.eval(code);
+                eval(code);
             } catch (error) {
-                // If an error occurs, display a custom error message in the output container
-                var errorMessage = 'Error: ' + error.name + '\nMessage: ' + error.message + '\n\n';
-                errorMessage += 'Possible fix: ';
-                switch (error.name) {
-                    case 'SyntaxError':
-                        errorMessage += 'Check for syntax errors in your code and correct them.';
-                        break;
-                    case 'ReferenceError':
-                        errorMessage += 'Make sure that all variable and function names are spelled correctly and exist in the current scope.';
-                        break;
-                    case 'TypeError':
-                        errorMessage += 'Check the data types of your variables and make sure that they are used correctly in your code.';
-                        break;
-                    default:
-                        errorMessage += 'Check your code for any errors and try again.';
-                }
-                var p = outputContainer.contentWindow.document.createElement('p');
-                p.innerText = errorMessage;
+                // If an error occurs, display it in the output container
+                var p = document.createElement('p');
+                p.innerText = 'Error: ' + error.message;
                 p.style.color = 'red';
-                outputContainer.contentWindow.document.body.appendChild(p);
+                outputContainer.appendChild(p);
             }
-
-            // Restore console.log() and console.error()
+            // Restore console.log()
             console.log = oldLog;
-            console.error = oldError;
         };
         var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
             lineNumbers: true,
             matchBrackets: true,
             autoCloseBrackets: true,
             mode: "javascript",
-            theme: "dracula",
-
+            theme: "dracula"
         });
-
         // Set the editor width and height
         editor.setSize("100%", "100%");
-
         // Set the output container height
         var outputContainer = document.getElementById('output-container');
         outputContainer.style.height = (window.innerHeight - 120) + 'px';
-
         // Listen for window resize events and adjust the output container height accordingly
         window.addEventListener('resize', function() {
             outputContainer.style.height = (window.innerHeight - 120) + 'px';
+        });
+    </script>
+    <script>
+        // Define the CodeMirror editor
+        const editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+            lineNumbers: true,
+            matchBrackets: true,
+            autoCloseBrackets: true,
+            mode: 'javascript',
+            theme: 'dracula',
+        });
+
+        // Set the editor width and height
+        editor.setSize('100%', '100%');
+
+        // Set the output container height
+        const outputContainer = document.getElementById('output-container');
+        outputContainer.style.height = `${window.innerHeight - 120}px`;
+
+        // Listen for window resize events and adjust the output container height accordingly
+        window.addEventListener('resize', () => {
+            outputContainer.style.height = `${window.innerHeight - 120}px`;
         });
     </script>
 </body>
